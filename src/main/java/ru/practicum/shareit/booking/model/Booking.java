@@ -13,14 +13,14 @@ public class Booking {
     Long id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
-    LocalDate dateStart; //дата и время начала бронирования;
+    LocalDate start; //дата и время начала бронирования;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
-    LocalDate dateEnd; //дата и время окончания бронирования;
+    LocalDate end; //дата и время окончания бронирования;
 
-    Long itemId; // id вещи, которую пользователь бронирует;
+    Long item; // id вещи, которую пользователь бронирует;
 
-    Long userIdBooker; // id арендатора, пользователя, который осуществляет бронирование
+    Long booker; // id арендатора, пользователя, который осуществляет бронирование
 
     BookingStatusEnum status; //Cтатус бронирования
 }

@@ -1,9 +1,7 @@
 package ru.practicum.shareit.item.dal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.EnternalException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
@@ -15,8 +13,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
     private final Map<Long, Item> items = new HashMap<>();
 
     @Override
@@ -26,8 +23,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item createItem(Long userId, Item item) {
-        validationItem(item); //проверяем указаны ли основные поля item (имя, описание, статус)
-        validationUserById(userId); // проверяем корректно ли указан id и существует ли пользователь
+        checkingUserExists(userId); // проверяем существует ли пользователь
         item.setId(getNextId()); // создали и добавили item id
         item.setOwnerUserId(userId); // добавили id владельца вещи
 
@@ -37,8 +33,8 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item updateItem(Long userId, Item newItem) {
-        validationUserById(userId);// проверяем существует ли пользователь и корректно ли указан id
-        validationItemById(userId, newItem.getId());// проверяем корректно ли указаны id и что пользователь владелец вещи
+        checkingUserExists(userId);// проверяем существует ли пользователь
+        checkingItemExists(userId, newItem.getId());// проверяем что вещь существует в Map и пользователь владелец вещи
 
         Item itemOld = items.get(newItem.getId());
 
@@ -64,15 +60,15 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public void deleteItem(Long userId, Long itemId) {
-        validationUserById(userId);// проверяем существует ли пользователь и корректно ли указан id
-        validationItemById(userId, itemId);// проверяем корректно ли указаны id и что пользователь владелец вещи
+        checkingUserExists(userId);// проверяем существует ли пользователь в Map
+        checkingItemExists(userId, itemId);//проверяем что вещь существует в Map и пользователь владелец вещи
         items.remove(itemId);
     }
 
     @Override
     public Item getItemById(Long userId, Long itemId) {
-        validationUserById(userId);// проверяем существует ли пользователь и корректно ли указан id
-        validationItemById(userId, itemId);// проверяем корректно ли указаны id и что пользователь владелец вещи
+        checkingUserExists(userId);// проверяем существует ли пользователь в Map
+        checkingItemExists(userId, itemId);// проверяем что вещь существует в Map и пользователь владелец вещи
         return items.get(itemId);
     }
 
@@ -87,7 +83,7 @@ public class ItemRepositoryImpl implements ItemRepository {
      */
     @Override
     public List<Item> getListItemsFromUserId(Long userId) {
-        validationUserById(userId);  // проверяем существует ли пользователь
+        checkingUserExists(userId);  // проверяем существует ли пользователь
         return items
                 .values()
                 .stream()
@@ -102,46 +98,25 @@ public class ItemRepositoryImpl implements ItemRepository {
      */
     @Override
     public List<Item> getItemsBySearch(String text) {
-        if (text == null || text.isEmpty()) {
-            return Collections.emptyList(); // Возвращаем пустой список
-        } else {
-            List<Item> itemsList = getAllItems();
-            return itemsList
-                    .stream()
-                    .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase())
-                            || item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                            && item.isAvailable()) //возвращает только доступные для аренды вещи = true.
-                    .toList();
-        }
+        List<Item> itemsList = getAllItems();
+        return itemsList
+                .stream()
+                .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase())
+                        || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                        && item.getAvailable()) //возвращает только доступные для аренды вещи = true.
+                .toList();
     }
 
-    public void validationItem(Item item) {
-        if (item.getName() == null) {
-            throw new EnternalException("Невозможно создать новую вещь. Название не указано.");
-        }
-        if (item.getDescription() == null) {
-            throw new EnternalException("Невозможно создать новую вещь. Описание вещи не указано.");
-        }
-        if (item.getAvailable() == null) {
-            throw new EnternalException("Не указан статус, доступна вещь для аренды или нет .");
-        }
-    }
-
-    public void validationUserById(Long userId) {
+    public void checkingUserExists(Long userId) {
         // проверяем существует ли пользователь
         if (!userRepository.getAllIdUsers().contains(userId)) { // Проверка наличия userId в Map
             throw new NotFoundException("Пользователя с указанным id " + userId + " не существует.");
         }
     }
 
-    public void validationItemById(Long userId, Long itemId) {
-        // проверяем корректно ли указаны id, существует ли id вещи и является ли пользователь владельцем вещи
-        if (itemId != null && itemId > 0) { // Проверка на null и положительность
-            if (!items.containsKey(itemId)) { // Проверка наличия itemId в Map
-                throw new NotFoundException("Item с указанным id " + itemId + " не существует.");
-            }
-        } else {
-            throw new NotFoundException("Необходимо указать существующий id item.");
+    public void checkingItemExists(Long userId, Long itemId) {
+        if (!items.containsKey(itemId)) { // Проверка наличия itemId в Map
+            throw new NotFoundException("Item с указанным id " + itemId + " не существует.");
         }
 
         Item item = items.get(itemId);

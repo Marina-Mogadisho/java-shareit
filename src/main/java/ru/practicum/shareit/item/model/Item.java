@@ -3,9 +3,6 @@ package ru.practicum.shareit.item.model;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 public class Item {
     Long id;
@@ -22,12 +19,4 @@ public class Item {
     Long requestId; // ссылка на запрос другого пользователя, если вещь была создана по его запросу
 
     Integer numberOfBookings; // сколько раз вещь была в аренде
-
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public Integer numberOfBookings() {
-        return numberOfBookings;
-    }
 }

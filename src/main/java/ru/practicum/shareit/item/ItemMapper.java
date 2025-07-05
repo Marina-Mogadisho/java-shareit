@@ -14,10 +14,10 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.isAvailable(),// статус о том, доступна или нет вещь для аренды;
+                item.getAvailable(),// статус о том, доступна или нет вещь для аренды;
                 item.getOwnerUserId(),// id владельца вещи
                 item.getRequestId(),// запрос на создание вещи для аренды
-                item.numberOfBookings() // сколько раз вещь была в аренде
+                item.getNumberOfBookings() // сколько раз вещь была в аренде
         );
     }
 
@@ -25,9 +25,9 @@ public class ItemMapper {
         return new ItemDtoResponse(
                 item.getName(),
                 item.getDescription(),
-                item.isAvailable(),
+                item.getAvailable(),
                 item.getRequestId(),
-                item.numberOfBookings()
+                item.getNumberOfBookings()
         );
     }
 

@@ -21,40 +21,40 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse validationException(final ValidationException e) {
-        log.error("Error validation" + e);
+        log.error("Error validation." + e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFoundException(final NotFoundException e) {
-        log.error("Not found" + e);
+        log.error("Not found." + e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse enternalException(final EnternalException e) {
-        log.error("Произошла непредвиденная ошибка.  " + e);
-        return new ErrorResponse("Произошла непредвиденная ошибка.  ");
+        log.error("Unexpected error." + e);
+        return new ErrorResponse("Unexpected error.");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse conflictException(final ConflictException e) {
-        log.error("Конфликт изменений. -> " + e);
-        return new ErrorResponse("Конфликт изменений. -> ");
+        log.error("Conflict of changes." + e);
+        return new ErrorResponse("Conflict of changes.");
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException e) {
+    @ExceptionHandler()
+    public ErrorResponse handleValidationExceptions(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return errors;
+        return new ErrorResponse("Validation failed", errors);
     }
 }

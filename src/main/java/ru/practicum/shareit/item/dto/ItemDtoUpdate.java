@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor// будет сгенерирован конструктор с одним параметром для каждого поля класса
-public class ItemDtoRequestUpdate {
+public class ItemDtoUpdate {
     String name;
     String description;
     Boolean available; // статус о том, доступна или нет вещь для аренды;

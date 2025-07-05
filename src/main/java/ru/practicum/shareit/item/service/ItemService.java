@@ -8,9 +8,9 @@ import java.util.Set;
 public interface ItemService {
     public List<ItemDtoResponse> getAllItems();
 
-    public ItemDto createItem(Long userId, ItemDtoRequest item);
+    public ItemDto createItem(Long userId, ItemDtoCreate item);
 
-    public ItemDto updateItem(Long userId, Long itemId, ItemDtoRequestUpdate newItem);
+    public ItemDto updateItem(Long userId, Long itemId, ItemDtoUpdate newItem);
 
     public void deleteItem(Long userId, Long itemId);
 

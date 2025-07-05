@@ -2,9 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dal.ItemRepository;
 import ru.practicum.shareit.item.dto.*;
@@ -19,8 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    @Autowired
-    final ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public List<ItemDtoResponse> getAllItems() {
@@ -32,9 +29,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto createItem(Long userId, ItemDtoRequest itemDto) {
+    public ItemDto createItem(Long userId, ItemDtoCreate itemDto) {
         log.info("Получен запрос пользователя на создание вещи: {}", itemDto);
-        validationIdByUser(userId); //проверяем корректно ли введен id пользователя
 
         Item item = new Item();
         item.setName(itemDto.getName());
@@ -47,8 +43,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(Long userId, Long itemId, ItemDtoRequestUpdate itemDto) {
-        validationIdByUser(userId); //проверяем корректно ли введен id пользователя
+    public ItemDto updateItem(Long userId, Long itemId, ItemDtoUpdate itemDto) {
 
         Item item = new Item();
         item.setId(itemId);
@@ -69,7 +64,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItem(Long userId, Long itemId) {
-        validationIdByUser(userId);
         itemRepository.deleteItem(userId, itemId);
     }
 
@@ -86,7 +80,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTONameDescription> getListItemsFromUserId(Long userId) {
-        validationIdByUser(userId);
         List<Item> listItemsById = itemRepository.getListItemsFromUserId(userId);
         return listItemsById.stream()
                 .map(ItemMapper::itemDTONameDescription)
@@ -100,11 +93,5 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
-    }
-
-    public void validationIdByUser(Long userId) {
-        if (userId == null || userId < 0) {
-            throw new NotFoundException("Id пользователя должно быть указано.");
-        }
     }
 }

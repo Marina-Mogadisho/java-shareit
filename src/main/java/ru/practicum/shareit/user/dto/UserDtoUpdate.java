@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserDtoRequestUpdate {
+public class UserDtoUpdate {
     String name;
     String email;
 }

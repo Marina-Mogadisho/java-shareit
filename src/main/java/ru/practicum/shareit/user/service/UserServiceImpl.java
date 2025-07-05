@@ -1,15 +1,14 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dal.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserDtoRequest;
-import ru.practicum.shareit.user.dto.UserDtoRequestUpdate;
+import ru.practicum.shareit.user.dto.UserDtoCreate;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
+import ru.practicum.shareit.user.dto.UserDtoUpdate;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -20,8 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<UserDtoResponse> getAllUsers() {
@@ -35,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDtoRequest userDto) {
+    public UserDto createUser(UserDtoCreate userDto) {
         User user = new User();
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
@@ -45,7 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDtoRequestUpdate userDto) {
+    public UserDto updateUser(Long userId, UserDtoUpdate userDto) {
         validationIdByUser(userId);
         User user = new User();
         user.setId(userId);
