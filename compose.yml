@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: marina
+      POSTGRES_PASSWORD: marina
+      POSTGRES_DB: shareit
+    ports:
+      - "5432:5432"
