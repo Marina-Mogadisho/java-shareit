@@ -181,7 +181,7 @@ public class BookingServiceImpl implements BookingService {
     //предназначен для получения списка бронирований для всех вещей, принадлежащих владельцу вещи.
     public List<BookingDtoGet> getBookingsListByOwnerUserId(Long ownerId, String state) {
 
-        if(ownerId == null) {
+        if (ownerId == null) {
             throw new NotFoundException("Не указан id пользователя");
         }
         // проверяем, что автор запроса есть в БД
@@ -250,7 +250,6 @@ public class BookingServiceImpl implements BookingService {
         };
     }
 
-
     //Проверяем по id пользователя, что пользователь есть в БД. Если есть, то возвращается объект типа User
     private User getUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -259,6 +258,5 @@ public class BookingServiceImpl implements BookingService {
         }
         return userOptional.get();
     }
-
 }
 
