@@ -5,7 +5,10 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor// будет сгенерирован конструктор с одним параметром для каждого поля класса
-public class ItemDTONameDescription {
+public class ItemDtoIdAndName {
+    Long id;
     String name;
-    String description;
 }
+
+
+

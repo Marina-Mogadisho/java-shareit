@@ -1,5 +1,7 @@
 <configuration debug="false">
-    <include resource="/org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <!--<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%X{user}] [%X{function}] [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -19,15 +21,16 @@
         </encoder>
     </appender>
     <logger name="org.springframework" level="ERROR"/>
-    <logger name="ru.yandex.practicum" level="INFO"/>
+    <logger name="ru.practicum" level="INFO"/>
     <root level="info">
         <!--  <appender-ref ref="STDOUT" />  -->
         <appender-ref ref="appFILE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
     <springProfile name="dev">
-        <logger name="ru.yandex.practicum" level="info"/>
+        <logger name="ru.practicum" level="info"/>
     </springProfile>
     <springProfile name="test">
-        <logger name="ru.yandex.practicum" level="trace"/>
+        <logger name="ru.practicum" level="trace"/>
     </springProfile>
 </configuration>

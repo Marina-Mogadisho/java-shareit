@@ -1,0 +1,23 @@
+package ru.practicum.shareit.booking.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import ru.practicum.shareit.booking.model.BookingStatusEnum;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor// будет сгенерирован конструктор с одним параметром для каждого поля класса
+public class BookingDto {
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long id;
+    private LocalDateTime start;
+    private LocalDateTime end;
+    private Item item;
+    private User booker;
+    private BookingStatusEnum status;
+}

@@ -1,7 +1,9 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dal.UserRepository;
@@ -19,11 +21,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private final UserRepository userRepository;
 
     @Override
-    public List<UserDtoResponse> getAllUsers() {
-        List<User> listUsers = userRepository.getAllUsers();
+    public List<UserDtoResponse> findAll() {
+        List<User> listUsers = userRepository.findAll();
         //Преобразование объектов типа User в объекты типа UserDtoResponse.
         // Это делается с помощью метода toUserDtoResponse, который находится в классе UserMapper
         return listUsers
@@ -33,40 +36,61 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDtoCreate userDto) {
+    public UserDto save(UserDtoCreate userDtoCreate) {
         User user = new User();
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
 
-        User createdUser = userRepository.createUser(user);
+        List<User> users = userRepository.findAll();
+        // Проверяем, что email ещё не используется
+        if (users.stream().anyMatch(u -> u.getEmail().equals(userDtoCreate.getEmail()))) {
+            throw new ConflictException("Пользователь с таким email уже существует.");
+        }
+        user.setName(userDtoCreate.getName());
+        user.setEmail(userDtoCreate.getEmail());
+
+        User createdUser = userRepository.save(user);
         return UserMapper.toUserDto(createdUser);
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDtoUpdate userDto) {
+    public UserDto update(Long userId, UserDtoUpdate userDto) {
         validationIdByUser(userId);
-        User user = new User();
-        user.setId(userId);
+
+        // Сначала получаем существующего пользователя из базы данных
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь с указанным ID не найден"));
+
         if (userDto.getName() != null) {
             user.setName(userDto.getName());
         }
+
+        List<User> users = userRepository.findAll();
+        // Проверяем, что email ещё не используется
+        if (users.stream().anyMatch(u -> u.getEmail().equals(userDto.getEmail()))) {
+            throw new ConflictException("Пользователь с таким email уже существует.");
+        }
+
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }
-        User updatedUser = userRepository.updateUser(user);
+// Если объект уже существует (, то есть у него уже есть идентификатор, который присутствует в базе данных),
+// то метод userRepository.save(user) выполнит обновление данных этого объекта.
+        User updatedUser = userRepository.save(user);
         return UserMapper.toUserDto(updatedUser);
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public void delete(Long userId) {
         validationIdByUser(userId);
-        userRepository.deleteUser(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с указанным ID не найден"));
+        userRepository.delete(user);
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public UserDto findById(Long userId) {
         validationIdByUser(userId);
-        User user = userRepository.getUserById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с указанным ID не найден"));
         return UserMapper.toUserDto(user);
     }
 

@@ -1,21 +1,13 @@
 package ru.practicum.shareit.user.dal;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
 import java.util.Set;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    public List<User> getAllUsers();
-
-    public User createUser(User user);
-
-    public User updateUser(User newUser);
-
-    public void deleteUser(Long userId);
-
-    public User getUserById(Long id);
-
-    public Set<Long> getAllIdUsers();
+    @Query("SELECT u.id FROM User u")
+    Set<Long> getAllIdUsers();
 }
