@@ -214,7 +214,6 @@ public class BookingServiceImpl implements BookingService {
 
 
     //Метод фильтрации бронирований по датам и статусу
-
     private List<BookingDtoGet> filterBookings(List<BookingDtoGet> bookingsDto, String state) {
         return switch (state) {
             case "CURRENT" -> // Логика для получения текущих бронирований
