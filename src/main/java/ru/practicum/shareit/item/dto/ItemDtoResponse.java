@@ -1,22 +1,14 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class Item {
-    Long id;
-
-    @NotBlank(message = "Название вещи не может быть пустым.")
+@AllArgsConstructor// будет сгенерирован конструктор с одним параметром для каждого поля класса
+public class ItemDtoResponse {
     String name;
-
     String description;
     Boolean available; // статус о том, доступна или нет вещь для аренды;
-
-    @NotBlank(message = "У вещи должен быть владелец.")
-    Long ownerUserId;
-
     Long requestId; // ссылка на запрос другого пользователя, если вещь была создана по его запросу
-
     Integer numberOfBookings; // сколько раз вещь была в аренде
 }

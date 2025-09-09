@@ -1,32 +1,25 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor// будет сгенерирован конструктор с одним параметром для каждого поля класса
-public class ItemDto {
+public class UserDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Long id;
 
-    @NotBlank(message = "Название вещи не может быть пустым.")
+    @NotBlank(message = "Имя не может быть пустым.")
     String name;
 
-    String description;
-
-    Boolean available; // статус о том, доступна или нет вещь для аренды;
-
-    @NotBlank(message = "У вещи должен быть владелец.")
-    Long ownerUserId; // id владельца вещи
-
-    Long requestId; // ссылка на запрос другого пользователя, если вещь была создана по его запросу
-
-    Integer numberOfBookings; // сколько раз вещь была в аренде
+    @NotBlank(message = "Емейл должен быть указан.")
+    @Email(message = "Емейл должен быть указан.")
+    String email;
 }
-
 /*
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     При десериализации JSON в объект данное поле будет игнорироваться,
