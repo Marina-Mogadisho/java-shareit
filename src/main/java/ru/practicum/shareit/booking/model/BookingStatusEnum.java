@@ -1,7 +1,9 @@
 package ru.practicum.shareit.booking.model;
 
-//Состояние бронирования
-//Необходимо разделять логику фильтрации (BookingFilterEnum) и состояния бронирований BookingStatusEnum.
+/**
+ * Состояние бронирования
+ * Необходимо разделять логику фильтрации (BookingFilterEnum) и состояния бронирований BookingStatusEnum.
+ */
 public enum BookingStatusEnum {
     WAITING, APPROVED, REJECTED, CANCELED
 }

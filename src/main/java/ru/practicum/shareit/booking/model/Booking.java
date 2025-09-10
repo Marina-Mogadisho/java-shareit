@@ -2,7 +2,9 @@ package ru.practicum.shareit.booking.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -11,7 +13,9 @@ import java.time.LocalDateTime;
 /**
  * Бронирование вещи.
  */
-@Data
+@Getter
+@Setter
+@ToString
 @Entity //привязать модель к базе данных — превратить их в сущности.
 @Table(name = "bookings")
 public class Booking {
@@ -29,11 +33,7 @@ public class Booking {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime end;
 
-
-    /*
-    в базе данных сохраняется именно идентификатор (id) сущности Item,
-     а не вся сущность целиком.
-     */
+    //В базе данных сохраняется именно идентификатор (id) сущности Item, а не вся сущность целиком.
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
     Item item; // id вещи, которую пользователь бронирует;
@@ -45,4 +45,16 @@ public class Booking {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     BookingStatusEnum status; //Cтатус бронирования
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

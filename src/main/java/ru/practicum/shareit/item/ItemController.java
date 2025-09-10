@@ -15,7 +15,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Validated
 @RequestMapping(path = "/items")
 public class ItemController {
 
@@ -50,22 +49,21 @@ public class ItemController {
         return itemService.findById(userId, itemId);
     }
 
-    /*
+    /**
     Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой из них.
     Эндпоинт GET /items.
-    нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования для каждой вещи,
+    Нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования для каждой вещи,
      */
     @GetMapping
     public List<ItemDtoList> getItemsFromUserId(@RequestHeader("X-Sharer-User-Id") @Positive Long userId) {
         return itemService.findItemsFromUserId(userId);
     }
 
-    /*
-    Поиск вещи потенциальным арендатором.
-    Пример запроса:  GET /items/search?text=шляп
-    @GetMapping("/search")
+    /**
+     *  Пример запроса:  GET /items/search?text=шляп
+     *  Поиск вещи потенциальным арендатором.
+     *required = true по умолчанию, если false то параметр необязательный + @Validated у класса
      */
-    // required = true по умолчанию, если false то параметр необязательный + @Validated у класса
     @GetMapping("/search")
     public List<ItemDtoResponse> getItemsBySearch(@RequestParam(name = "text", required = false) String text) {
         log.info("Получен запрос на поиск вещи, в названии и описании которой есть текст: {}", text);
@@ -76,13 +74,19 @@ public class ItemController {
     }
 
 
-    //POST /items/{itemId}/comment
+    /**
+     * POST /items/{itemId}/comment
+     * @param authorUserId автор комментария
+     * @param itemId id вещи на которую автор оставляет комментарий
+     * @param commentRequestDto текст комментария
+     * @return CommentDto
+     */
     @PostMapping("{itemId}/comment")
     public CommentDto saveComment(
             @RequestHeader("X-Sharer-User-Id")
-            @Positive Long authorUserId, // автор комментария
-            @PathVariable @Positive Long itemId, // id вещи на которую автор оставляет комментарий
-            @RequestBody @Valid CommentRequestDto commentRequestDto) {   // текст комментария
+            @Positive Long authorUserId,
+            @PathVariable @Positive Long itemId,
+            @RequestBody @Valid CommentRequestDto commentRequestDto) {
         log.info("Получен запрос на создание комментария (отзыва) на вещь с id: {}", itemId);
         return itemService.saveComment(authorUserId, itemId, commentRequestDto);
     }

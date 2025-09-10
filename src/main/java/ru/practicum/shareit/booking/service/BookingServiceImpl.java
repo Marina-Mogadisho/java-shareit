@@ -2,8 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dal.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -28,20 +28,19 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    @Autowired
     private final BookingRepository bookingRepository;
-    @Autowired
     private final ItemRepository itemRepository;
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final RequestRepository requestRepository;
 
     LocalDateTime currentDate = LocalDateTime.now();
 
-    //POST /bookings
+    /**
+     * POST /bookings
+     */
     @Override
     public BookingDto save(BookingDtoCreate bookingDtoCreate, Long userBookerId) {
         log.info("Получен запрос на аренду вещи:  {}", bookingDtoCreate);
@@ -103,13 +102,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
-        //проверяем, что владелец бронированной вещи есть в БД
-        //getUserById(userOwnerId);
-
-        Optional<User> userOptional = userRepository.findById(userOwnerId);
-        if (userOptional.isEmpty()) {
-            throw new ValidationException("В БД  нет пользователя с переданным id = " + userOwnerId);
-        }
+        userRepository.findById(userOwnerId)
+                .orElseThrow(() -> new ValidationException("В БД  нет пользователя с переданным id = " + userOwnerId));
 
         // проверяем, что пользователь по переданному id (userOwnerId) является владельцем вещи
         // по которой планируется изменение статуса в бронировании
@@ -129,8 +123,10 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDtoPatch(bookingSave);
     }
 
-    //Получение данных о конкретном бронировании
-    //Может быть выполнено либо автором бронирования, либо владельцем вещи
+    /**
+     * Получение данных о конкретном бронировании
+     * Может быть выполнено либо автором бронирования, либо владельцем вещи
+     */
     public BookingDtoGet getBookingById(Long bookingId, Long bookerUserId) {
 
         // проверяем, что автор запроса есть в БД
@@ -155,10 +151,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-    //GET /bookings?state={state}.
-    //Получение списка всех бронирований текущего пользователя (букера), того кто оформлял запрос на бронирование.
-    // Не владелец вещи
-    //Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
+    /**
+     * GET /bookings?state={state}.
+     * Получение списка всех бронирований текущего пользователя (букера), того кто оформлял запрос на бронирование.
+     * Не владелец вещи
+     * Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
+     */
     public List<BookingDtoGet> getBookingsListByUserId(Long bookerUserId, String state) {
 
         // проверяем, что автор запроса есть в БД
@@ -177,8 +175,10 @@ public class BookingServiceImpl implements BookingService {
         return filterBookings(bookingsDto, state);//Метод фильтрации бронирований по датам и статусу
     }
 
-    //GET /bookings/owner?state={state}
-    //предназначен для получения списка бронирований для всех вещей, принадлежащих владельцу вещи.
+    /**
+     * GET /bookings/owner?state={state}
+     * предназначен для получения списка бронирований для всех вещей, принадлежащих владельцу вещи.
+     */
     public List<BookingDtoGet> getBookingsListByOwnerUserId(Long ownerId, String state) {
 
         if (ownerId == null) {
@@ -212,8 +212,9 @@ public class BookingServiceImpl implements BookingService {
 
     }
 
-
-    //Метод фильтрации бронирований по датам и статусу
+    /**
+     * Метод фильтрации бронирований по датам и статусу
+     */
     private List<BookingDtoGet> filterBookings(List<BookingDtoGet> bookingsDto, String state) {
         return switch (state) {
             case "CURRENT" -> // Логика для получения текущих бронирований
@@ -249,7 +250,9 @@ public class BookingServiceImpl implements BookingService {
         };
     }
 
-    //Проверяем по id пользователя, что пользователь есть в БД. Если есть, то возвращается объект типа User
+    /**
+     * Проверяем по id пользователя, что пользователь есть в БД. Если есть, то возвращается объект типа User
+     */
     private User getUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {

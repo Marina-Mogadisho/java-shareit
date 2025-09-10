@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dal.BookingRepository;
@@ -22,23 +21,18 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-//@Transactional
+@Transactional
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    @Autowired
     private final ItemRepository itemRepository;
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final BookingRepository bookingRepository;
-    @Autowired
     private final CommentRepository commentRepository;
 
 
@@ -82,11 +76,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Long userId, Long itemId, ItemDtoUpdate itemDto) {
         getUserById(userId); //проверяем есть ли в БД такой пользователь, если есть, идем дальше
-        Optional<Item> itemOptional = itemRepository.findById(itemId); // ищем в БД item(тип Optional) с переданным id
-        if (itemOptional.isEmpty()) {
-            throw new NotFoundException("Item с указанным id: " + userId + " нет в БД.");
-        }
-        Item item = itemOptional.get(); // достали из БД объект Item, который нужно обновить
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("В БД нет вещи с переданным id = " + itemId));
 
         User userByItem = item.getUser(); // достали у item объект - владелец-пользователь
         Long userIdByItem = userByItem.getId(); // достали у владельца его id
@@ -125,8 +117,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void delete(Long userId, Long itemId) {
         getUserById(userId); //проверяем есть ли в БД такой пользователь, если есть, идем дальше
+
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item с указанным ID не найден"));
+                .orElseThrow(() -> new NotFoundException("В БД нет вещи с переданным id = " + itemId));
         itemRepository.delete(item);
     }
 
@@ -134,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDtoComments findById(Long userId, Long itemId) {
         getUserById(userId); //проверяем есть ли в БД такой пользователь, если есть, идем дальше
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item с указанным ID не найден"));
+                .orElseThrow(() -> new NotFoundException("В БД нет вещи с переданным id = " + itemId));
 
         // вызываем список комментариев к этой вещи
         List<Comment> commentListByItem = commentRepository.findCommentsListByItem(item);
@@ -170,10 +163,10 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAllIdItems();
     }
 
-    /*
-    Просмотр владельцем списка всех его вещей с указанием названия, описания и даты для каждой из них.
-    Эндпоинт GET /items.
-    */
+    /**
+     * Эндпоинт GET /items.
+     * Просмотр владельцем списка всех его вещей с указанием названия, описания и даты для каждой из них.
+     */
     @Override
     public List<ItemDtoList> findItemsFromUserId(Long userId) {
         getUserById(userId); // проверяем, что пользователь существует
@@ -196,10 +189,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    /*
-    Поиск вещи потенциальным арендатором.
-    Пример запроса:  GET /items/search?text=Шляпа летняя
-    @GetMapping("/search")
+    /**
+     * Пример запроса:  GET /items/search?text=Шляпа летняя
+     * Поиск вещи потенциальным арендатором.
+     * GetMapping("/search")
      */
     @Override
     public List<ItemDtoResponse> findItemsBySearch(String text) {
@@ -220,11 +213,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private User getUserById(Long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new NotFoundException("В БД  нет пользователя с переданным id = " + userId);
-        }
-        return userOptional.get();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("В БД  нет пользователя с переданным id = " + userId));
     }
 
     @Override
@@ -234,11 +224,13 @@ public class ItemServiceImpl implements ItemService {
 
         String text = commentRequestDto.getText();
         User authorUser = getUserById(authorUserId);// проверяем, что пользователь существует
-        Optional<Item> itemOptional = itemRepository.findById(itemId); // находим вещь в БД
-        if (itemOptional.isEmpty()) {
-            throw new NotFoundException("В БД  нет вещи с переданным id = " + itemId);
-        }
-        Item item = itemOptional.get(); // достали из БД вещь с переданным itemId
+
+        // находим вещь в БД
+        // достали из БД вещь с переданным itemId
+        Item item = itemRepository.findById(itemId) // находим вещь в БД
+                .orElseThrow(() -> new NotFoundException("В БД нет вещи с переданным id = " + itemId));
+
+
         //достали из БД список бронирований на указанную вещь
         List<Booking> bookingsListByItem = bookingRepository.getBookingsListByItem(item);
 

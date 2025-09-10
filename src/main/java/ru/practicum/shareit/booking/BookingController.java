@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoCreate;
@@ -14,7 +13,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 import java.util.List;
 
 @Slf4j
-@Validated
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -22,7 +20,9 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    //POST /bookings
+    /**
+     * POST /bookings
+     */
     @PostMapping
     public BookingDto save(@RequestBody @Valid BookingDtoCreate booking,
                            @RequestHeader("X-Sharer-User-Id") Long userBookerId) {
@@ -30,9 +30,12 @@ public class BookingController {
         return bookingService.save(booking, userBookerId);
     }
 
-    //PATCH /bookings/{bookingId}?approved={approved}
-    // параметр approved может принимать значения true или false.
-    // пример: PATCH /bookings/123?approved=true
+    /**
+     * PATCH /bookings/{bookingId}?approved={approved}
+     *
+     * @param approved может принимать значения true или false.
+     *                 пример: PATCH /bookings/123?approved=true
+     */
     @PatchMapping("/{bookingId}")
     public BookingDtoPatchApproved updateBookingStatus(@PathVariable Long bookingId,  // id запроса бронирования
                                                        @RequestParam(value = "approved") boolean approved, // статус бронирования, при создании запроса
@@ -41,19 +44,37 @@ public class BookingController {
         return bookingService.updateBookingStatus(bookingId, approved, userOwnerId);
     }
 
-    //GET /bookings/{bookingId}.
-    //Получение данных о конкретном бронировании
-    //Может быть выполнено либо автором бронирования, либо владельцем вещи
+    /**
+     * GET /bookings/{bookingId}.
+     * Получение данных о конкретном бронировании
+     * Может быть выполнено либо автором бронирования, либо владельцем вещи
+     *
+     * @param bookerUserId id автора запроса на получение данных
+     * @return BookingDtoGet
+     */
     @GetMapping("{bookingId}")
     public BookingDtoGet getBookingById(@PathVariable Long bookingId,
-                                        @RequestHeader("X-Sharer-User-Id") Long bookerUserId) { // id автора запроса на получение данных
+                                        @RequestHeader("X-Sharer-User-Id") Long bookerUserId) {
         log.info("Получен запрос на получении данных о бронировании с id: {}", bookingId);
         return bookingService.getBookingById(bookingId, bookerUserId);
     }
 
-    //GET /bookings?state={state}.
-    //Получение списка всех бронирований текущего пользователя (букера, арендатора).
-    // Фильтрация в соответствии с параметром state
+
+    /**
+     * GET /bookings?state={state}.
+     * Получение списка всех бронирований текущего пользователя (букера, арендатора).
+     * Фильтрация в соответствии с параметром state
+     *
+     * @param state  Фильтрация в соответствии с параметром state:
+     *               ALL (англ. «все»).
+     *               CURRENT (англ. «текущие»),
+     *               PAST (англ. «завершённые»),
+     *               FUTURE (англ. «будущие»),
+     *               WAITING (англ. «ожидающие подтверждения»),
+     *               REJECTED (англ. «отклонённые»)
+     * @param userId (букер, арендатор)
+     * @return list<BookingDtoGet>
+     */
     @GetMapping
     public List<BookingDtoGet> getBookingsListByUserId(
             @RequestParam(value = "state", defaultValue = "ALL") String state,
@@ -62,9 +83,13 @@ public class BookingController {
         return bookingService.getBookingsListByUserId(userId, state);
     }
 
-    //GET /bookings/owner?state={state}
-    //предназначен для получения списка бронирований для всех вещей, принадлежащих владельцу вещи.
-    // Фильтрация в соответствии с параметром state
+    /**
+     * GET /bookings/owner?state={state}
+     * предназначен для получения списка бронирований для всех вещей, принадлежащих владельцу вещи.
+     * Фильтрация в соответствии с параметром state
+     *
+     * @param userId - владелец вещи
+     */
     @GetMapping("/owner")
     public List<BookingDtoGet> getBookingsListByOwnerId(
             @RequestParam(value = "state", defaultValue = "ALL") String state,

@@ -1,9 +1,9 @@
 package ru.practicum.shareit.request.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.user.model.User;
 
 /**
@@ -11,14 +11,15 @@ import ru.practicum.shareit.user.model.User;
  */
 @Entity //привязать модель к базе данных — превратить их в сущности.
 @Table(name = "requests")
-@Data
+@Getter
+@Setter
+@ToString
 public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @NotBlank(message = "Текст запроса не может быть пустым.")
     @Column(name = "description", nullable = false)
     String description;
 
@@ -28,7 +29,18 @@ public class Request {
      */
     @ManyToOne
     @JoinColumn(name = "requestor_id", nullable = false)
-    @NotNull(message = "У запроса на аренду вещи должен быть владелец.")
     User requestor; //id пользователя, создавшего запрос
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
 

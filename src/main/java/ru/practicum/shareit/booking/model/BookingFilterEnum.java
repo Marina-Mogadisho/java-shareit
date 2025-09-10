@@ -1,9 +1,9 @@
 package ru.practicum.shareit.booking.model;
 
 
-/*
-Значения, которые описывают категории для фильтрации бронирований:
-Необходимо разделять логику фильтрации (BookingFilterEnum) и состояния бронирований BookingStatusEnum.
+/**
+ * Значения, которые описывают категории для фильтрации бронирований:
+ * Необходимо разделять логику фильтрации (BookingFilterEnum) и состояния бронирований BookingStatusEnum.
  */
 public enum BookingFilterEnum {
     ALL, CURRENT, PAST, FUTURE, WAITING, REJECTED

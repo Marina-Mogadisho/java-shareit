@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.user.model.User;
 
-@Data
+@Getter @Setter @ToString
 @Entity //привязать модель к базе данных — превратить их в сущности.
 @Table(name = "items")
 public class Item {
@@ -14,7 +17,6 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @NotBlank(message = "Название вещи не может быть пустым.")
     @Column(name = "name", nullable = false)
     String name;
 
@@ -26,6 +28,17 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
-    @NotNull(message = "У вещи должен быть владелец.")
     User user;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
