@@ -3,10 +3,14 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor// будет сгенерирован конструктор с одним параметром для каждого поля класса
-public class ItemDtoResponse {
+public class ItemDtoList {
+
     String name;
     String description;
-    Boolean available; // статус о том, доступна или нет вещь для аренды;
+    LocalDateTime start;
+    LocalDateTime end;
 }

@@ -6,19 +6,22 @@ import java.util.List;
 import java.util.Set;
 
 public interface ItemService {
-    public List<ItemDtoResponse> getAllItems();
 
-    public ItemDto createItem(Long userId, ItemDtoCreate item);
+    List<ItemDtoResponse> findAll();
 
-    public ItemDto updateItem(Long userId, Long itemId, ItemDtoUpdate newItem);
+    ItemDto save(Long userId, ItemDtoCreate item);
 
-    public void deleteItem(Long userId, Long itemId);
+    ItemDto update(Long userId, Long itemId, ItemDtoUpdate newItem);
 
-    public ItemDto getItemById(Long userId, Long itemId);
+    void delete(Long userId, Long itemId);
 
-    public Set<Long> getAllIdItems();
+    ItemDtoComments findById(Long userId, Long itemId);
 
-    public List<ItemDTONameDescription> getListItemsFromUserId(Long userId);
+    Set<Long> findAllIdItems();
 
-    public List<ItemDtoResponse> getItemsBySearch(String text);
+    List<ItemDtoList> findItemsFromUserId(Long userId);
+
+    List<ItemDtoResponse> findItemsBySearch(String text);
+
+    CommentDto saveComment(Long authorUserId, Long itemId, CommentRequestDto commentRequestDto);
 }

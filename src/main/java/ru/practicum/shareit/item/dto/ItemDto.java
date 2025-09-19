@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class ItemDto {
     Long id;
 
     @NotBlank(message = "Название вещи не может быть пустым.")
+    @NotNull
     String name;
 
     String description;
@@ -21,10 +23,6 @@ public class ItemDto {
 
     @NotBlank(message = "У вещи должен быть владелец.")
     Long ownerUserId; // id владельца вещи
-
-    Long requestId; // ссылка на запрос другого пользователя, если вещь была создана по его запросу
-
-    Integer numberOfBookings; // сколько раз вещь была в аренде
 }
 
 /*

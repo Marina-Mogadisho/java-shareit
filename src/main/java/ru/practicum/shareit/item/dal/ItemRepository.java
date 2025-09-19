@@ -1,24 +1,23 @@
 package ru.practicum.shareit.item.dal;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 import java.util.Set;
 
-public interface ItemRepository {
-    public List<Item> getAllItems();
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    public Item createItem(Long userId, Item item);
+    @Query("SELECT it.id FROM Item it")
+    Set<Long> findAllIdItems();
 
-    public Item updateItem(Long userId, Item newItem);
+    //Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой из них.
+    @Query("SELECT it FROM Item it WHERE it.user.id = ?1")
+    List<Item> findItemsFromUserId(Long userId);
 
-    public void deleteItem(Long userId, Long itemId);
-
-    public Item getItemById(Long userId, Long itemId);
-
-    public Set<Long> getAllIdItems();
-
-    public List<Item> getListItemsFromUserId(Long userId);
-
-    public List<Item> getItemsBySearch(String text);
+    @Query("SELECT it FROM Item it " +
+            "WHERE LOWER(it.name) LIKE LOWER(CONCAT('%', :text, '%')) " +
+            "OR LOWER(it.description) LIKE LOWER(CONCAT('%', :text, '%'))")
+    List<Item> findItemsBySearch(String text);
 }
