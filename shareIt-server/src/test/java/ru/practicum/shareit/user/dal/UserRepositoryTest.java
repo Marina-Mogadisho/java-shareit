@@ -41,7 +41,9 @@ class UserRepositoryTest {
     @Rollback
     void findUser() {
         User current = userRepository.save(user);
-        Optional<User> searchUser = userRepository.findById(6L);
+        Optional<User> searchUser = userRepository.findById(current.getId());
+        assertThat(searchUser).isPresent();
         assertThat(current).isEqualTo(searchUser.get());
     }
+
 }
