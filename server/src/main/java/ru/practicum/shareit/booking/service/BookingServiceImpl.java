@@ -1,8 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -31,16 +32,20 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RequestRepository requestRepository;
+    private final BookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final RequestRepository requestRepository;
 
-    LocalDateTime currentDate = LocalDateTime.now();
+    @Setter
+    private LocalDateTime currentDate;
+
+    @PostConstruct
+    public void init() {
+        if (currentDate == null) {
+            currentDate = LocalDateTime.now();
+        }
+    }
 
     /**
      * POST /bookings
@@ -258,7 +263,7 @@ public class BookingServiceImpl implements BookingService {
      */
     @Override
     @Transactional(readOnly = true)
-    public  User getUserById(Long userId) {
+    public User getUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new NotFoundException("В БД  нет пользователя с переданным id = " + userId);

@@ -3,11 +3,10 @@ package ru.practicum.shareit.booking.service;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dal.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -32,27 +31,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-@DataJpaTest
-@Sql(scripts = "/data.sql")
+@ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
 
     @Mock
     private BookingRepository bookingRepository;
+
     @Mock
     private ItemRepository itemRepository;
+
     @Mock
     private UserRepository userRepository;
+
     @Mock
     private RequestRepository requestRepository;
 
     @InjectMocks
     private BookingServiceImpl bookingService;
-    private LocalDateTime fixedNow = LocalDateTime.of(2024, 1, 1, 12, 0);
+
+    private final LocalDateTime fixedNow = LocalDateTime.of(2024, 1, 1, 12, 0);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        bookingService.currentDate = fixedNow;
+        // Устанавливаем фиксированное время для тестов
+        bookingService.setCurrentDate(fixedNow);
     }
 
     private BookingDtoGet createBookingDto(Long id, BookingStatusEnum status,
@@ -399,7 +401,6 @@ class BookingServiceImplTest {
         user.setId(userId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        //  when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
         ValidationException ex = assertThrows(ValidationException.class,
