@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -34,38 +32,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookingController.class)
-@Import(BookingControllerTest.TestConfig.class)
+@AutoConfigureMockMvc
+@SuppressWarnings("deprecation") // подавляем предупреждение на весь класс
 class BookingControllerTest {
-    @TestConfiguration
-    static class TestConfig {
 
-        @Bean
-        public BookingService bookingService() {
-            return Mockito.mock(BookingService.class);
-        }
 
-        @Bean
-        public ItemService itemService() {
-            return Mockito.mock(ItemService.class);
-        }
-
-        @Bean
-        public UserService userService() {
-            return Mockito.mock(UserService.class);
-        }
-    }
-
-    @Autowired
+    @MockBean
     private BookingService bookingService;
 
-    @Autowired
+    @MockBean
     private ItemService itemService;
 
-    @Autowired
+    @MockBean
     private UserService userService;
 
     @Autowired
     private MockMvc mockMvc;
+
 
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
