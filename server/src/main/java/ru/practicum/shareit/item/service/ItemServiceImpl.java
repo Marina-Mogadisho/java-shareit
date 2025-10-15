@@ -20,6 +20,7 @@ import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.dal.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final RequestRepository requestRepository;
+    private final Clock clock;
 
 
     @Override
@@ -282,7 +284,8 @@ public class ItemServiceImpl implements ItemService {
 
         // список всех бронирований автора на вещь с переданным id
         List<Booking> bookingListCompleted = new ArrayList<>();
-        LocalDateTime currentDate = LocalDateTime.now(); // для выполнения теста ставлю currentDate здесь, не в начале класса
+       // LocalDateTime currentDate = LocalDateTime.now(); // для выполнения теста ставлю currentDate здесь, не в начале класса
+        LocalDateTime currentDate = LocalDateTime.now(clock);
         for (Booking booking : bookingListAuthor) {
 
             if ((booking.getEnd()).isBefore(currentDate)) {
