@@ -65,14 +65,7 @@ class BookingServiceImplTest {
 
     private final LocalDateTime fixedNow = LocalDateTime.of(2024, 1, 1, 12, 0);
 
-/*
-    @BeforeEach
-    void setUp() {
-        // Устанавливаем фиксированное время для тестов
-        bookingService.setCurrentDate(fixedNow);
-    }
 
- */
 @BeforeEach
 void setUp() {
     fixedClock = Clock.fixed(fixedNow.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());

@@ -38,18 +38,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
 
-/*
-    @Setter
-    private LocalDateTime currentDate;
 
-    @PostConstruct
-    public void init() {
-        if (currentDate == null) {
-            currentDate = LocalDateTime.now();
-        }
-    }
-
- */
 
     // Для тестов.
     // Источник времени, внедряется через конструктор
