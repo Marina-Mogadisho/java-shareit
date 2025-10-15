@@ -196,6 +196,56 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void findById_shouldSetBookingNextWhenFutureBookingExists() {
+        // Создаем тестового пользователя (если нужно)
+        User testUser = userRepository.save(User.builder()
+                .name("Test User")
+                .email("testuser@mail.com")
+                .build());
+
+        // Создаем вещь, если нужно (item из теста или новый)
+        Item testItem = itemRepository.save(Item.builder()
+                .name("Тестовое изобретение")
+                .description("Описание")
+                .available(true)
+                .user(testUser)
+                .build());
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // Создаем прошедшее бронирование (bookingLast)
+        Booking bookingPast = bookingRepository.save(Booking.builder()
+                .item(testItem)
+                .booker(testUser)
+                .start(now.minusDays(10))
+                .end(now.minusDays(5))
+                .status(BookingStatusEnum.APPROVED)
+                .build());
+
+        // Создаем будущее бронирование (bookingNext), чтобы покрыть ветку else if
+        Booking bookingFuture = bookingRepository.save(Booking.builder()
+                .item(testItem)
+                .booker(testUser)
+                .start(now.plusDays(5))
+                .end(now.plusDays(10))
+                .status(BookingStatusEnum.APPROVED)
+                .build());
+
+        // Вызываем метод
+        ItemDtoComments result = itemService.findById(testUser.getId(), testItem.getId());
+
+        // Проверяем, что bookingNext именно наше будущее бронирование
+        assertNotNull(result);
+        assertNotNull(result.getNextBooking());
+        assertEquals(bookingFuture.getId(), result.getNextBooking().getId());
+
+        // Проверяем также что bookingLast соответствует прошлому бронированию
+        assertNotNull(result.getLastBooking());
+        assertEquals(bookingPast.getId(), result.getLastBooking().getId());
+    }
+
+
+    @Test
     void saveComment_shouldSaveCommentWhenBookingCompleted() {
         // Создаем законченный booking для authorUser и item
         bookingRepository.save(Booking.builder()
@@ -247,6 +297,26 @@ class ItemServiceImplTest {
 
         assertTrue(exception.getMessage().contains("Пользователь не может оставить отзыв"));
     }
+
+    @Test
+    void saveComment_shouldThrowWhenUserNeverBookedItem() {
+        // Создаем пользователя без указания id, чтобы он был уникальным и корректно сохранен
+        User anotherUser = userRepository.save(
+                User.builder()
+                        .name("Another User")
+                        .email("another@mail.com")
+                        .build()
+        );
+
+        CommentRequestDto commentRequestDto = new CommentRequestDto();
+        commentRequestDto.setText("Отзыв");
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> itemService.saveComment(anotherUser.getId(), item.getId(), commentRequestDto));
+
+        assertTrue(exception.getMessage().contains("Пользователь не может оставить отзыв"));
+    }
+
 
     @Test
     void save_shouldThrowValidationException_whenNameIsNull() {

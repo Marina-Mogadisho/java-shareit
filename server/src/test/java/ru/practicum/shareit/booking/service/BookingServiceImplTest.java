@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dal.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -23,21 +24,11 @@ import ru.practicum.shareit.request.dal.RequestRepository;
 import ru.practicum.shareit.user.dal.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -66,12 +57,12 @@ class BookingServiceImplTest {
     private final LocalDateTime fixedNow = LocalDateTime.of(2024, 1, 1, 12, 0);
 
 
-@BeforeEach
-void setUp() {
-    fixedClock = Clock.fixed(fixedNow.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
-    // Подменяем clock в сервисе на фиксированный для тестов
-    ReflectionTestUtils.setField(bookingService, "clock", fixedClock);
-}
+    @BeforeEach
+    void setUp() {
+        fixedClock = Clock.fixed(fixedNow.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+        // Подменяем clock в сервисе на фиксированный для тестов
+        ReflectionTestUtils.setField(bookingService, "clock", fixedClock);
+    }
 
 
     private BookingDtoGet createBookingDto(Long id, BookingStatusEnum status,

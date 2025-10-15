@@ -268,6 +268,10 @@ public class ItemServiceImpl implements ItemService {
 
         //достали из БД список бронирований на указанную вещь
         List<Booking> bookingsListByItem = bookingRepository.getBookingsListByItem(item);
+        if (bookingsListByItem.isEmpty()) {
+            throw new NotFoundException("Пользователь не может оставить отзыв," +
+                    " так как у вещи с id: " + itemId + " не было бронирований.");
+        }
 
         //ищем в каком бронировании есть арендатор с идентификатором authorUserId
         List<Booking> bookingListAuthor = new ArrayList<>(); // список всех бронирований автора
@@ -284,7 +288,7 @@ public class ItemServiceImpl implements ItemService {
 
         // список всех бронирований автора на вещь с переданным id
         List<Booking> bookingListCompleted = new ArrayList<>();
-       // LocalDateTime currentDate = LocalDateTime.now(); // для выполнения теста ставлю currentDate здесь, не в начале класса
+        // LocalDateTime currentDate = LocalDateTime.now(); // для выполнения теста ставлю currentDate здесь, не в начале класса
         LocalDateTime currentDate = LocalDateTime.now(clock);
         for (Booking booking : bookingListAuthor) {
 
