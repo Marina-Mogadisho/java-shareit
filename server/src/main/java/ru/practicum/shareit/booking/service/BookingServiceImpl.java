@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,19 +35,6 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
-
-/*
-    @Setter
-    private LocalDateTime currentDate;
-
-    @PostConstruct
-    public void init() {
-        if (currentDate == null) {
-            currentDate = LocalDateTime.now();
-        }
-    }
-
- */
 
     // Для тестов.
     // Источник времени, внедряется через конструктор
