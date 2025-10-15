@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import ru.practicum.shareit.request.dal.RequestRepository;
 import ru.practicum.shareit.user.dal.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +37,28 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
+
+/*
+    @Setter
+    private LocalDateTime currentDate;
+
+    @PostConstruct
+    public void init() {
+        if (currentDate == null) {
+            currentDate = LocalDateTime.now();
+        }
+    }
+
+ */
+
+    // Для тестов.
+    // Источник времени, внедряется через конструктор
+    private final Clock clock;
+
+    // Возвращает текущее время, управляемое Clock
+    private LocalDateTime now() {
+        return LocalDateTime.now(clock);
+    }
 
     /**
      * POST /bookings
@@ -212,24 +237,25 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<BookingDtoGet> filterBookings(List<BookingDtoGet> bookingsDto, String state) {
+        LocalDateTime currentDate = now();
         return switch (state) {
             case "CURRENT" -> // Логика для получения текущих бронирований
                     bookingsDto.stream()
                             .filter(booking -> booking.getStatus().equals(BookingStatusEnum.APPROVED))
                             .filter(booking -> booking.getStart().isBefore(LocalDateTime.now())
-                                    && booking.getEnd().isAfter(LocalDateTime.now()))
+                                    && booking.getEnd().isAfter(currentDate))
                             .sorted(Comparator.comparing(BookingDtoGet::getStart).reversed())
                             .toList();
             case "PAST" -> // Логика для получения завершенных бронирований
                     bookingsDto.stream()
                             .filter(booking -> booking.getStatus().equals(BookingStatusEnum.APPROVED))
-                            .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                            .filter(booking -> booking.getEnd().isBefore(currentDate))
                             .sorted(Comparator.comparing(BookingDtoGet::getStart).reversed())
                             .toList();
             case "FUTURE" -> // Логика для получения будущих бронирований
                     bookingsDto.stream()
                             .filter(booking -> booking.getStatus().equals(BookingStatusEnum.APPROVED))
-                            .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                            .filter(booking -> booking.getStart().isAfter(currentDate))
                             .sorted(Comparator.comparing(BookingDtoGet::getStart).reversed())
                             .toList();
             case "WAITING" -> // Логика для получения бронирований ожидающих подтверждения

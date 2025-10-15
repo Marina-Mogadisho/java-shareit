@@ -26,6 +26,18 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -49,13 +61,25 @@ class BookingServiceImplTest {
     @InjectMocks
     private BookingServiceImpl bookingService;
 
+    private Clock fixedClock;
+
     private final LocalDateTime fixedNow = LocalDateTime.of(2024, 1, 1, 12, 0);
 
+/*
     @BeforeEach
     void setUp() {
         // Устанавливаем фиксированное время для тестов
         bookingService.setCurrentDate(fixedNow);
     }
+
+ */
+@BeforeEach
+void setUp() {
+    fixedClock = Clock.fixed(fixedNow.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+    // Подменяем clock в сервисе на фиксированный для тестов
+    ReflectionTestUtils.setField(bookingService, "clock", fixedClock);
+}
+
 
     private BookingDtoGet createBookingDto(Long id, BookingStatusEnum status,
                                            LocalDateTime start, LocalDateTime end) {
